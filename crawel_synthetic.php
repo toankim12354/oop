@@ -36,8 +36,8 @@ class Parser {
 
 
     protected function innerHTML(DOMNode $node) {
-        return implode(array_map([$node->ownerDocument, "saveHTML"],
-            iterator_to_array($node->childNodes)));
+        return strip_tags( implode(array_map([$node->ownerDocument, "saveHTML"],
+            iterator_to_array($node->childNodes))));
     }
 
     public function parse() {
@@ -65,7 +65,7 @@ class VnexpressParser extends Parser {
         return null;
     }
 }
-// Parser for parsing content from the Dan Tri website   Authentication failed for
+// Parser for parsing content from the Dan Tri website
 class DantriParser extends Parser {
     public function parse() {
         $html = $this->get_html();
@@ -108,12 +108,13 @@ class VietnamnetParser extends Parser {
         return null;
     }
 }
+//connect dtabasea
 class DB {
     protected $conn;
     public function __construct($host, $username, $password, $dbname) {
         $this->conn = mysqli_connect($host, $username, $password, $dbname);
     }
-
+//data processed with in the database
     public function query($sql) {
         try {
             return mysqli_query($this->conn, $sql);
@@ -126,7 +127,7 @@ class DB {
         return mysqli_real_escape_string($this->conn, $value);
     }
 }
-
+//data processing curl
 class CURL {
     public static function get($url) {
         $ch = curl_init();
@@ -140,17 +141,18 @@ class CURL {
 
 $db = new DB('localhost', 'toanlt', 'Toanlt123', 'Parser');
 $url = 'https://vietnamnet.vn/my-tam-tiet-lo-chuyen-choi-game-tin-nhan-cho-nguoi-ay-2131430.html';
-$vnexpress_parser = new VnexpressParser($url);
+//$vnexpress_parser = new VnexpressParser($url);
 $VietnamnetParser = new VietnamnetParser($url);
-$DantriParser = new DantriParser($url);
-$data = $vnexpress_parser->parse();
+//$DantriParser = new DantriParser($url);
+//$data = $vnexpress_parser->parse();
 $data = $VietnamnetParser->parse();
-$data = $DantriParser->parse();
+//$data = $DantriParser->parse();
 $title = $db->escape($data['title']);
 $content = $db->escape($data['content']);
 $data = $db->escape($data['date']);
 $sql = "INSERT INTO wrapper (title, content, thoi_gian) VALUES ('$title', '$content', '$data')";
     $db->query($sql);
+
 
 
 
