@@ -5,7 +5,7 @@ class Parser {
     public function __construct($url) {
         $this->url = $url;
     }
-//Get the HTML content
+//Get in the HTML content
     protected function get_html() {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);

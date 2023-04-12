@@ -1,5 +1,6 @@
 <?php
 require 'Parser.php';
+require 'Curl.php';
 class VnexpressParser extends Parser {
     public function parse() {
         $html = $this->get_html();

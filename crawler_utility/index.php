@@ -1,5 +1,6 @@
 <?php
 require 'DB.php';
+require 'Parser.php';
 $db = new DB('localhost', 'toanlt', 'Toanlt123', 'Parser');
 $url = 'https://vietnamnet.vn/my-tam-tiet-lo-chuyen-choi-game-tin-nhan-cho-nguoi-ay-2131430.html';
 $vnexpress_parser = new VnexpressParser($url);

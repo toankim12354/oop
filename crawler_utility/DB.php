@@ -1,5 +1,6 @@
 <?php
 require 'index.php';
+//connect dtabasea
 class DB {
     protected $conn;
     public function __construct($host, $username, $password, $dbname) {
