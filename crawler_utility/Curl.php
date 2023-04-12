@@ -1,4 +1,5 @@
 <?php
+require 'index.php';
 class CURL {
     public static function get($url) {
         $ch = curl_init();
