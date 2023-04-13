@@ -1,6 +1,5 @@
 <?php
-require 'Parser.php';
-require 'Curl.php';
+// Parser for parsing content from the vn website
 class VnexpressParser extends Parser {
     public function parse() {
         $html = $this->get_html();
@@ -9,13 +8,9 @@ class VnexpressParser extends Parser {
             libxml_use_internal_errors(true);
             $dom->loadHTML($html);
             libxml_clear_errors();
-            $title = $dom->getElementsByTagName('h1')[0]->textContent;
-
-            $class = $this->getElementsByClass('fck_detail');
-            $content = $class;
-            $tg = $this->getElementsByClass('date');
-            $date = $tg;
-
+            $title = $this->getElementsByClass('title-detail');
+            $content = $this->getElementsByClass('fck_detail');
+            $date = $this->getElementsByClass('date');
             return ['title' => $title, 'content' => $content, 'date' => $date];
         }
         return null;

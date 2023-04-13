@@ -1,6 +1,5 @@
 <?php
-require 'Parser.php';
-require 'Curl.php';
+// Parser for parsing content from the Vietnamnet website
 class VietnamnetParser extends Parser {
     public function parse() {
         $html = $this->get_html();
@@ -9,15 +8,12 @@ class VietnamnetParser extends Parser {
             libxml_use_internal_errors(true);
             $dom->loadHTML($html);
             libxml_clear_errors();
-            $title = $dom->getElementsByTagName('h1')[0]->textContent;
+            $title  = $this->getElementsByClass('content-detail-title');
             // Get the content
-            $class = $this->getElementsByClass('maincontent main-content');
-            $content = $class;
+            $content = $this->getElementsByClass('maincontent main-content');
             // Get the publication
-            $tg = $this->getElementsByClass('bread-crumb-detail__time');
-            $date = $tg;
-
-            return ['title' => $title, 'content' => $content, 'date' => $date];
+            $date = $this->getElementsByClass('bread-crumb-detail__time');
+            return ['title' => $title,'content' => $content, 'date' => $date];
         }
         return null;
     }

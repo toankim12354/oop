@@ -4,16 +4,19 @@ class Parser {
     protected $url;
 
     public function __construct($url) {
-        $this->url = $url;
+
+            $this->url = $url;
+
+
     }
 //Get the HTML content
-    protected function get_html() {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $html = curl_exec($ch);
-        curl_close($ch);
-        return $html;
+    public function get_html() {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $this->url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $html = curl_exec($ch);
+            curl_close($ch);
+            return $html;
     }
 //Get the elements in the HTML document
     protected function getElementsByClass($class) {
@@ -25,21 +28,16 @@ class Parser {
             libxml_clear_errors();
             $finder = new DomXPath($dom);
             $node = $finder->query("//*[contains(@class, '$class')]")->item(0);
-
-             if ($node) {
+            if ($node) {
                 return $this->innerHTML($node);
             }
         }
         return null;
     }
-
-
-
-    protected function innerHTML(DOMNode $node) {
+    public function innerHTML(DOMNode $node) {
         return strip_tags( implode(array_map([$node->ownerDocument, "saveHTML"],
             iterator_to_array($node->childNodes))));
     }
-
     public function parse() {
         throw new Exception('Not implemented');
     }
@@ -53,13 +51,9 @@ class VnexpressParser extends Parser {
             libxml_use_internal_errors(true);
             $dom->loadHTML($html);
             libxml_clear_errors();
-            $title = $dom->getElementsByTagName('h1')[0]->textContent;
-
-            $class = $this->getElementsByClass('fck_detail');
-            $content = $class;
-            $tg = $this->getElementsByClass('date');
-            $date = $tg;
-
+            $title = $this->getElementsByClass('title-detail');
+            $content = $this->getElementsByClass('fck_detail');
+           $date = $this->getElementsByClass('date');
             return ['title' => $title, 'content' => $content, 'date' => $date];
         }
         return null;
@@ -74,13 +68,9 @@ class DantriParser extends Parser {
             libxml_use_internal_errors(true);
             $dom->loadHTML($html);
             libxml_clear_errors();
-            $title = $dom->getElementsByTagName('h1')[0]->textContent;
-
-            $class = $this->getElementsByClass('singular-content');
-            $content = $class;
-            $tg = $this->getElementsByClass('author-time');
-            $date = $tg;
-
+            $title = $this->getElementsByClass('title-page detail');
+            $content = $this->getElementsByClass('singular-content');
+            $date = $this->getElementsByClass('author-time');
             return ['title' => $title, 'content' => $content, 'date' => $date];
         }
         return null;
@@ -95,15 +85,12 @@ class VietnamnetParser extends Parser {
             libxml_use_internal_errors(true);
             $dom->loadHTML($html);
             libxml_clear_errors();
-            $title = $dom->getElementsByTagName('h1')[0]->textContent;
+            $title  = $this->getElementsByClass('content-detail-title');
             // Get the content
-            $class = $this->getElementsByClass('maincontent main-content');
-            $content = $class;
+            $content = $this->getElementsByClass('maincontent main-content');
             // Get the publication
-            $tg = $this->getElementsByClass('bread-crumb-detail__time');
-            $date = $tg;
-
-            return ['title' => $title, 'content' => $content, 'date' => $date];
+            $date = $this->getElementsByClass('bread-crumb-detail__time');
+            return ['title' => $title,'content' => $content, 'date' => $date];
         }
         return null;
     }
@@ -122,36 +109,32 @@ class DB {
             echo 'Error: ' . $e->getMessage();
         }
     }
-
     public function escape($value) {
         return mysqli_real_escape_string($this->conn, $value);
     }
 }
-//data processing curl
-class CURL {
-    public static function get($url) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $result = curl_exec($ch);
-        curl_close($ch);
-        return $result;
-    }
-}
-
 $db = new DB('localhost', 'toanlt', 'Toanlt123', 'Parser');
-$url = 'https://vietnamnet.vn/my-tam-tiet-lo-chuyen-choi-game-tin-nhan-cho-nguoi-ay-2131430.html';
+$url = 'https://dantri.com.vn/giao-duc-huong-nghiep/ha-noi-ca-covid-19-tang-1535-hoc-sinh-mot-lop-12-nghi-vi-om-sot-20230413101238282.htm';
 //$vnexpress_parser = new VnexpressParser($url);
-$VietnamnetParser = new VietnamnetParser($url);
-//$DantriParser = new DantriParser($url);
+//$VietnamnetParser = new VietnamnetParser($url);
+$DantriParser = new DantriParser($url);
 //$data = $vnexpress_parser->parse();
-$data = $VietnamnetParser->parse();
-//$data = $DantriParser->parse();
+//$data = $VietnamnetParser->parse();
+$data = $DantriParser->parse();
 $title = $db->escape($data['title']);
 $content = $db->escape($data['content']);
-$data = $db->escape($data['date']);
-$sql = "INSERT INTO wrapper (title, content, thoi_gian) VALUES ('$title', '$content', '$data')";
+$date = $db->escape($data['date']);
+if(!empty($data)) {
+    $sql = "INSERT INTO wrapper (title, content, thoi_gian) VALUES ('$title', '$content', '$date')";
     $db->query($sql);
+
+} else {
+    // handle the case where $date is empty
+    echo "nor";
+}
+
+
+
 
 
 
