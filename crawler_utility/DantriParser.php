@@ -1,6 +1,6 @@
 <?php
-require 'Parser.php';
-require 'Curl.php';
+// Parser for parsing content from the Dan Tri website
+
 class DantriParser extends Parser {
     public function parse() {
         $html = $this->get_html();
@@ -9,13 +9,9 @@ class DantriParser extends Parser {
             libxml_use_internal_errors(true);
             $dom->loadHTML($html);
             libxml_clear_errors();
-            $title = $dom->getElementsByTagName('h1')[0]->textContent;
-
-            $class = $this->getElementsByClass('singular-content');
-            $content = $class;
-            $tg = $this->getElementsByClass('author-time');
-            $date = $tg;
-
+            $title = $this->getElementsByClass('title-page detail');
+            $content = $this->getElementsByClass('singular-content');
+            $date = $this->getElementsByClass('author-time');
             return ['title' => $title, 'content' => $content, 'date' => $date];
         }
         return null;

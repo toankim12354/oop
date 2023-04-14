@@ -1,5 +1,5 @@
 <?php
-require 'index.php';
+
 //connect dtabasea
 class DB {
     protected $conn;
