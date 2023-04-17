@@ -1,11 +1,10 @@
 <?php
-
 class Parser {
     protected $url;
 
     public function __construct($url) {
 
-            $this->url = $url;
+        $this->url = $url;
 
 
     }
@@ -15,12 +14,12 @@ class Parser {
      */
 //Get the HTML content
     public function getHtml(): string {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            $html = curl_exec($ch);
-            curl_close($ch);
-            return $html;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $html = curl_exec($ch);
+        curl_close($ch);
+        return $html;
     }
 //Get the elements in the HTML document
 
@@ -86,7 +85,7 @@ class VnexpressParser extends Parser {
             libxml_clear_errors();
             $title = $this->getElementsByClass(self::title_Vnexpress);
             $content = $this->getElementsByClass(self::content_Vnexpress);
-           $date = $this->getElementsByClass(self::date_Vnexpress);
+            $date = $this->getElementsByClass(self::date_Vnexpress);
             return ['title' => $title, 'content' => $content, 'date' => $date];
         }
         return null;
@@ -149,71 +148,3 @@ class VietnamnetParser extends Parser {
         return null;
     }
 }
-//connect dtabasea
-class DatabaseConnection {
-    /**
-     * @var false|mysqli
-     */
-    protected $conn;
-
-    /**
-     * connect to database
-     * @param string $host
-     * @param string $username
-     * @param string $password
-     * @param string $dbname
-     */
-    public function __construct($host, $username, $password, $dbname) {
-        $this->conn = mysqli_connect($host, $username, $password, $dbname);
-    }
-//data processed with in the database
-
-    /**
-     * run a query
-     * @param $sql
-     * @return bool|mysqli_result|void
-     */
-    public function query($sql) {
-        try {
-            return mysqli_query($this->conn, $sql);
-        } catch (mysqli_sql_exception $e) {
-            echo 'Error: ' . $e->getMessage();
-        }
-    }
-
-    /**
-     *filter special characters
-     * @param $value
-     * @return string
-     */
-    public function escape($value) {
-        return mysqli_real_escape_string($this->conn, $value);
-    }
-}
-$db = new DatabaseConnection('localhost', 'toanlt', 'Toanlt123', 'Parser');
-$url = 'https://dantri.com.vn/giao-duc-huong-nghiep/ha-noi-ca-covid-19-tang-1535-hoc-sinh-mot-lop-12-nghi-vi-om-sot-20230413101238282.htm';
-//$vnexpress_parser = new VnexpressParser($url);
-//$VietnamnetParser = new VietnamnetParser($url);
-$DantriParser = new DantriParser($url);
-//$data = $vnexpress_parser->parse();
-//$data = $VietnamnetParser->parse();
-$data = $DantriParser->parse();
-$title = $db->escape($data['title']);
-$content = $db->escape($data['content']);
-$date = $db->escape($data['date']);
-if(!empty($data)) {
-    $sql = "INSERT INTO wrapper (title, content, thoi_gian) VALUES ('$title', '$content', '$date')";
-    $db->query($sql);
-
-} else {
-    // handle the case where $date is empty
-    echo "not data";
-}
-
-
-
-
-
-
-
-
